@@ -1,0 +1,17 @@
+{
+  "name": "music-server",
+  "version": "1.0.0",
+  "description": "Local music streaming server using Node.js and Express",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["music", "server", "streaming", "express"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "music-metadata": "^11.10.0"
+  }
+}

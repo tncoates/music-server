@@ -1,0 +1,206 @@
+body {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: auto;
+  background: #111;
+  color: #eee;
+}
+#player {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  background: #222;
+  padding: 10px;
+  border-radius: 10px;
+}
+#artwork {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+#songList li {
+  cursor: pointer;
+  padding: 5px;
+}
+#songList li:hover {
+  background: #333;
+}
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+
+
+/* Player sizing variable */
+:root { --player-height: 84px; --accent: #1db954; --bg: rgba(17,17,17,0.9); }
+
+/* Make room so content isn't hidden under the fixed player */
+body {
+  padding-bottom: var(--player-height);
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Fixed player */
+.player-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--player-height);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg);
+  color: #fff;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+}
+
+/* artwork */
+.player-fixed img#artwork {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex: 0 0 auto;
+  background: #222;
+}
+
+/* metadata */
+.player-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  max-width: 35%;
+  overflow: hidden;
+}
+.player-meta #title {
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.player-meta #artist {
+  font-size: 0.85em;
+  color: #d6d6d6;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* controls area */
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 200px;
+}
+
+/* buttons */
+.ctrl-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ctrl-btn:hover { background: rgba(255,255,255,0.06); }
+
+/* progress bar styling */
+.progress {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  outline: none;
+  cursor: pointer;
+}
+.progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(29,185,84,0.14);
+  cursor: pointer;
+}
+
+/* time & volume */
+.time {
+  min-width: 90px;
+  font-size: 12px;
+  color: #cfcfcf;
+  text-align: right;
+}
+
+/* simple volume style */
+.volume {
+  width: 90px;
+  height: 6px;
+}
+
+
+
+/* Styling for the play button */
+#play {
+  /* Set a fixed size for the button */
+  width: 40px; 
+  height: 40px;
+  /* Hide the text content (the emoji) */
+  font-size: 0;
+  /* Basic styling */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  /* Center the background image */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain; /* or a specific size like 30px 30px */
+}
+
+/* Style when audio is PAUSED (showing the PLAY icon) */
+#play.paused {
+  background-image: url('images/play.png');
+}
+
+/* Style when audio is PLAYING (showing the PAUSE icon) */
+#play.playing {
+  background-image: url('images/pause.png');
+}
+
+
+/* Style for the button container itself (to remove default button look if necessary) */
+.ctrl-btn {
+    /* Set dimensions and remove default styles like background and border */
+    width: 40px; /* Example size */
+    height: 40px; /* Example size */
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex; /* Helps center the image */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Style for the image inside the button */
+.control-icon {
+    /* Ensure the image scales neatly within the button */
+    width: 100%; /* Take up the full width of the button */
+    height: 100%; /* Take up the full height of the button */
+    object-fit: contain; /* Ensures the image fits without cropping */
+}
