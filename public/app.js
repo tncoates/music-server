@@ -14,6 +14,8 @@ const progress = document.getElementById("progress");
 const timeEl = document.getElementById("time");
 const volumeEl = document.getElementById("volume");
 
+const PREV_THRESHOLD = 3;
+
 let songs = [];     // master array from server
 let filtered = [];  // current filtered + sorted array shown in UI
 let currentFilteredIndex = -1; // index into 'filtered' for currently playing song
@@ -122,7 +124,13 @@ function updateMediaSessionForSong(song) {
         navigator.mediaSession.setActionHandler('play', () => audio.play());
         navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         navigator.mediaSession.setActionHandler('previoustrack', () => {
-            if (filtered.length && currentFilteredIndex >= 0) playFilteredIndex(currentFilteredIndex - 1);
+            if (filtered.length === 0 || currentFilteredIndex < 0) return;
+
+            if (audio.currentTime <= PREV_THRESHOLD) {
+                playFilteredIndex(currentFilteredIndex - 1);
+            } else {
+                audio.currentTime = 0;
+            }
         });
         navigator.mediaSession.setActionHandler('nexttrack', () => {
             if (filtered.length && currentFilteredIndex >= 0) playFilteredIndex(currentFilteredIndex + 1);
@@ -130,10 +138,20 @@ function updateMediaSessionForSong(song) {
 
         // Seeking support (seekto is used by some system UIs, and seekforward/backward by media keys)
         navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-            // details.seekOffset may be provided by the browser; otherwise fallback
             const offset = details && details.seekOffset ? details.seekOffset : 10;
-            audio.currentTime = Math.max(0, audio.currentTime - offset);
+            // if the backward request would move us before the threshold, treat it as "previous track"
+            if (audio.currentTime <= PREV_THRESHOLD || audio.currentTime - offset <= 0) {
+                // If we're already very close to start, go previous; otherwise set to start
+                if (audio.currentTime <= PREV_THRESHOLD) {
+                    if (filtered.length && currentFilteredIndex >= 0) playFilteredIndex(currentFilteredIndex - 1);
+                } else {
+                    audio.currentTime = 0;
+                }
+            } else {
+                audio.currentTime = Math.max(0, audio.currentTime - offset);
+            }
         });
+
         navigator.mediaSession.setActionHandler('seekforward', (details) => {
             const offset = details && details.seekOffset ? details.seekOffset : 10;
             audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + offset);
@@ -199,7 +217,13 @@ function playFilteredIndex(i) {
 // prev/next follow the filtered list
 prevBtn.addEventListener("click", () => {
     if (filtered.length === 0 || currentFilteredIndex < 0) return;
-    playFilteredIndex(currentFilteredIndex - 1);
+
+    if (audio.currentTime <= PREV_THRESHOLD) {
+        playFilteredIndex(currentFilteredIndex - 1);
+    }
+    else {
+        audio.currentTime = 0;
+    }
 });
 nextBtn.addEventListener("click", () => {
     if (filtered.length === 0 || currentFilteredIndex < 0) return;

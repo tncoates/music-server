@@ -130,19 +130,3 @@ app.get('/artwork/:filename', async (req, res) => {
 
 app.listen(PORT, () => console.log(`🎵 Server running at http://localhost:${PORT}`));
 
-
-/*
-todo
-
-add automatically playing next song
-
-ui for playback controls
-
-playback view only
-
-maybe figure out how to make song artist and art show up on mobile
-
-better ui for viewing songs
-
-
-*/
