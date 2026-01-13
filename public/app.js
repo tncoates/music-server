@@ -263,12 +263,26 @@ audio.addEventListener("timeupdate", () => {
     if (!isSeeking) progress.value = Math.floor(audio.currentTime);
     timeEl.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
     updatePlayButton();
+    
+    const percent = (audio.currentTime / audio.duration) * 100 || 0;
+    progress.style.setProperty('--progress', `${percent}%`);
+
 });
+
+audio.addEventListener("ended", () => {
+    if (filtered.length === 0 || currentFilteredIndex < 0) return;
+
+    playFilteredIndex(currentFilteredIndex + 1);
+})
+
 
 // seek by dragging progress
 progress.addEventListener("input", () => {
     isSeeking = true;
     timeEl.textContent = `${formatTime(progress.value)} / ${formatTime(audio.duration)}`;
+
+    audio.currentTime = (((progress.value / 100) * audio.duration) / audio.duration) * 100 || 0;
+    //console.log(audio.currentTime);
 });
 progress.addEventListener("change", () => {
     audio.currentTime = Number(progress.value);
