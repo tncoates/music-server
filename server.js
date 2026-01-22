@@ -4,12 +4,20 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { parseFile } from "music-metadata";
+import multer from "multer";
+import { exec } from "child_process"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 8080;
 const MUSIC_DIR = path.join(__dirname, "music");
+
+const upload = multer({
+  dest: 'uploads/',
+  limits: { fileSize: 100 * 1024 * 1024 }
+});
+
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -126,6 +134,77 @@ app.get('/artwork/:filename', async (req, res) => {
         res.status(500).end();
     }
 });
+
+app.post(
+  '/api/edit-metadata',
+  upload.fields([
+    { name: 'audio', maxCount: 1 },
+    { name: 'cover', maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const audio = req.files.audio[0];
+      const cover = req.files.cover?.[0];
+
+      const { title, artist, album } = req.body;
+
+      const ext = path.extname(audio.originalname);
+      const outputName = `${Date.now()}_${audio.originalname}`;
+      const outputPath = path.join('outputs', outputName);
+
+      let cmd = `ffmpeg -y -i "${audio.path}"`;
+
+      // album art
+      if (cover) {
+        cmd += ` -i "${cover.path}" -map 0:a -map 1:v`;
+        cmd += ` -c copy`;
+        cmd += ` -disposition:v attached_pic`;
+      } else {
+        cmd += ` -c copy`;
+      }
+
+      // metadata
+      if (title) cmd += ` -metadata title="${title}"`;
+      if (artist) cmd += ` -metadata artist="${artist}"`;
+      if (album) cmd += ` -metadata album="${album}"`;
+
+      cmd += ` "${outputPath}"`;
+
+      exec(cmd, err => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'FFmpeg failed' });
+        }
+
+        fs.unlink(audio.path, () => {});
+        if (cover) fs.unlink(cover.path, () => {});
+
+        res.json({
+          downloadUrl: `/download/${outputName}`
+        });
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Metadata edit failed' });
+    }
+  }
+);
+
+
+app.get('/download/:file', (req, res) => {
+  const filePath = path.join(__dirname, 'outputs', req.params.file);
+
+  res.download(filePath, err => {
+
+    if (err) {
+        console.error("Download error:", err);
+        return;
+    }
+
+    fs.unlink(filePath, () => {});
+  });
+});
+
 
 
 app.listen(PORT, () => console.log(`🎵 Server running at http://localhost:${PORT}`));
